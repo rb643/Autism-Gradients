@@ -108,7 +108,7 @@ from pySTATIS import statis
 names = list(xrange(392))
 X = [np.load("./Embs/"+ os.path.basename(filename)+"_embedding_dense_emb.npy") for filename in selected2]
 out = statis.statis(X, names, fname='statis_results.npy')
-statis.project_back(X, out['Q'], path = "./Regs/",fnames = selected2)
+statis.project_back(X, out['C_cols'], path = "./Regs/",fnames = selected2)
 np.save("Mean_Vec.npy",out['F'])
 
 # saving everything in one dump
@@ -143,7 +143,7 @@ def rebuild_nii(num):
     nim_out = nib.Nifti1Image(imdat_new, nim.get_affine(), nim.get_header())
     nim_out.set_data_dtype('float32')
     # to save:
-    #nim_out.to_filename('res.nii')
+    nim_out.to_filename('Gradient_'+ str(num) +'_res.nii')
 
     nilearn.plotting.plot_epi(nim_out)
     return(nim_out)
@@ -162,3 +162,27 @@ for i in df_phen:
 df_phen['selec'] = np.where(df_phen['filename'].isin((selected2)), 1, 0)
 
 ######################### compare slopes #######################
+## there is probably an easier way to loop through this and calculate the slopes...?
+# start with an empty list
+from scipy import stats
+grdnt_slope = []
+for i in selected2:
+    # load gradients
+    print i
+    filename = i
+    grdnt = np.load("./Regs/" + filename + ".npy")
+    # do we need a specific ordering of the nodes??
+    y = list(xrange(392))
+    temp = []
+    for ii in range(10):
+        x = sorted(grdnt[:,ii]) # just sort in ascending order?
+        slope, intercept, r_value, p_value, std_err = stats.linregress(x,y)
+        temp.append(slope)
+        
+    grdnt_slope.append(temp)
+    
+######################### integrate slopes #######################
+    ## NB check to make sure that the phenotypic file and selected file are ordered the same?
+data = df_phen.loc[df_phen["selec"] == 1]
+data['slopes'] = grdnt_slope
+data.to_csv('Combined.csv', sep='\t')
