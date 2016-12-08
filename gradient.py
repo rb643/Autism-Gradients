@@ -17,7 +17,6 @@ Created on Mon Dec 01 15:05:56 2016
 # main/cpac/filt_noglobal/rois_cc400/ > for data files
 # main/Affn/ > for adjacency matrices
 # main/Embs/ > for diffusion embedding files
-# main/Regs/ > for registered gradient files
 
 # download ABIDE data:
 # http://preprocessed-connectomes-project.org/abide/download.html
@@ -94,7 +93,11 @@ for i in selected:
     # Save results
     np.save("./Embs/"+savename+"_embedding_dense_emb.npy", emb)
     np.save("./Embs/"+savename+"_embedding_dense_res.npy", res)
-    np.save("./Embs/"+savename+"_embedding_dense_res_veconly.npy", res['vectors']) #store vectors only
+
+    X = res['vectors']
+    X = (X.T/X[:,0]).T[:,1:]    
+    
+    np.save("./Embs/"+savename+"_embedding_dense_res_veconly.npy", X) #store vectors only
 
 # get dimension
 #resolution = len(res['vectors'][0,:])
@@ -107,9 +110,9 @@ from pySTATIS import statis
 
 #load vectors
 names = list(xrange(392))
-X = [np.load("./Embs/"+ os.path.basename(filename)+"_embedding_dense_emb.npy") for filename in selected2]
+X = [np.load("./Embs/"+ os.path.basename(filename)+"_embedding_dense_res_veconly.npy") for filename in selected2]
 out = statis.statis(X, names, fname='statis_results.npy')
-statis.project_back(X, out['C_cols'], path = "./Regs/",fnames = selected2)
+statis.project_back(X, out['Q'], path = "./Regs/",fnames = selected2)
 np.save("Mean_Vec.npy",out['F'])
 
 # saving everything in one dump
@@ -159,9 +162,10 @@ df_phen = pd.read_csv('Phenotypic_V1_0b_preprocessed1.csv')
 # add a column that matches the filename
 for i in df_phen:
     df_phen['filename'] = join(df_phen['FILE_ID']+"_rois_cc400.1D")
-    df_phen['filenamenpy'] = join(df_phen['FILE_ID']+"_rois_cc400.1D.npy") # useful to match up with registered gradient files
-# add a selection variable for those files that we used
+
 df_phen['selec'] = np.where(df_phen['filename'].isin((selected2)), 1, 0)
+
+
 
 ######################### double check files #######################
 from os import listdir
@@ -178,12 +182,11 @@ for i in onlyfiles:
 # all subjects in array
 a = np.array(a)
 mean_vec = np.mean(np.array(a), axis = 0)
-# check to see if this is the same as the mean_vec in the other output?
 
 ######################### compare slopes #######################
 ## there is probably an easier way to loop through this and calculate the slopes...?
-from scipy import stats
 # start with an empty list
+from scipy import stats
 grdnt_slope = []
 for i in selected2:
     # load gradients
@@ -192,7 +195,7 @@ for i in selected2:
     grdnt = np.load("./Regs/" + filename + ".npy")
     # do we need a specific ordering of the nodes??
     y = list(xrange(392))
-    temp = [] # use a temporary subject specific list
+    temp = []
     for ii in range(10):
         x = sorted(grdnt[:,ii]) # just sort in ascending order?
         slope, intercept, r_value, p_value, std_err = stats.linregress(x,y)
@@ -201,7 +204,7 @@ for i in selected2:
     grdnt_slope.append(temp)
     
 ######################### integrate slopes #######################
-    ## NB need to check to make sure that the phenotypic file and selected file are ordered the same!!!
+    ## NB check to make sure that the phenotypic file and selected file are ordered the same?
 data = df_phen.loc[df_phen["selec"] == 1]
 data['slopes'] = grdnt_slope
 data.to_csv('Combined.csv', sep='\t')
