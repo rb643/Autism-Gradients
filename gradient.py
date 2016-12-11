@@ -162,6 +162,7 @@ df_phen = pd.read_csv('Phenotypic_V1_0b_preprocessed1.csv')
 # add a column that matches the filename
 for i in df_phen:
     df_phen['filename'] = join(df_phen['FILE_ID']+"_rois_cc400.1D")
+    df_phen['filenamelpy'] = join(df_phen['FILE_ID']+"_rois_cc400.1D.npy")
 
 df_phen['selec'] = np.where(df_phen['filename'].isin((selected2)), 1, 0)
 
@@ -202,9 +203,16 @@ for i in selected2:
         temp.append(slope)
         
     grdnt_slope.append(temp)
+grdnt_slope = np.array(grdnt_slope)
+# make it into a dataframe
+data_grdnt = pd.DataFrame(grdnt_slope)
+data_grdnt['file'] = selected2
     
 ######################### integrate slopes #######################
-    ## NB check to make sure that the phenotypic file and selected file are ordered the same?
+    ## NB check to make sure that the phenotypic file and selected file are ordered the same!
 data = df_phen.loc[df_phen["selec"] == 1]
-data['slopes'] = grdnt_slope
-data.to_csv('Combined.csv', sep='\t')
+data['filenamelow'] = data['filename'].str.lower()
+data = data.sort(['filenamelow'])
+
+output = data.merge(data_grdnt, left_on='filename',right_on='file',how='outer')
+output.to_csv('Combined.csv', sep='\t')
