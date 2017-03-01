@@ -1,5 +1,4 @@
 ---
-title: Autism Gradients Front page
 ---
 
 ## Autism gradients of hierarchical organization
