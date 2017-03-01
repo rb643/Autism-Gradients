@@ -1,4 +1,4 @@
-name: rbbrainhack2
+name: rbbrainhack
 dependencies:
   - scikit-learn
   - numpy
