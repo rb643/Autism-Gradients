@@ -1,3 +1,8 @@
+---
+title: Autism Gradients Front page
+layout: post
+---
+
 ## Autism gradients of hierarchical organization
 
 #### Brainhack project on exploring the use of connectivity gradients to study cortical hierarchies in autism
