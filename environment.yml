@@ -7,3 +7,4 @@ dependencies:
   - pip:
     - git+git://github.com/janfreyberg/pySTATIS
     - git+git://github.com/janfreyberg/mapalign
+    - nibabel
