@@ -4,7 +4,6 @@ dependencies:
   - scikit-learn
   - numpy
   - scipy
-  - nibabel
   - pip:
     - git+git://github.com/janfreyberg/pySTATIS
     - git+git://github.com/janfreyberg/mapalign
