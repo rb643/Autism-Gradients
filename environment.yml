@@ -1,5 +1,6 @@
 name: rbbrainhack
 dependencies:
+  - python=2.7
   - jupyter
   - scikit-learn
   - numpy
