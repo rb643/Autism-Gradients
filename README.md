@@ -17,13 +17,17 @@ Thus, in the present project we would like to investigate these cortical hierarc
 Make sure you have anaconda or miniconda installed:
 https://conda.io/miniconda.html
 
+(You should also have git installed)
+
 Clone this repository:
 `git clone https://github.com/rb643/Autism-Gradients`
 
 Create a conda environment from the environment.yml file (you have to be inside the repo folder):
 `conda env create -n rbbrainhack -f environment.yml`
+You should then activate this environment:
+`source activate rbbrainhack`
 
-download and unpack cluster_roi:
+download and unpack cluster_roi - n.b. this is for macs, on windows doing it manually should work too:
 ```
 curl -LOk "https://github.com/ccraddock/cluster_roi/archive/v1.0.0.zip"
 unzip v1.0.0

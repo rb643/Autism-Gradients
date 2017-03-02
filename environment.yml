@@ -1,9 +1,11 @@
 name: rbbrainhack
 dependencies:
+  - python=2.7
+  - jupyter
   - scikit-learn
   - numpy
   - scipy
-  - nibabel
   - pip:
     - git+git://github.com/janfreyberg/pySTATIS
     - git+git://github.com/janfreyberg/mapalign
+    - nibabel
